@@ -31,6 +31,7 @@ if [[ $keymap_file == *.gz ]]; then
 	temp_map_files=("${temp_map_files[@]}" "$keymap_file")
 fi
 
+old_keymap_file="$keymap_file"
 keymap_filename=${keymap_file%????}
 
 if [ "$swap_braces" -eq 1 ]; then
@@ -38,6 +39,7 @@ if [ "$swap_braces" -eq 1 ]; then
 	sed -r -e 's/([0-9]+) = (bracket.{4,5})( +)([a-z]+)/\1 = \4\3\2/' "$keymap_file" > "$keymap_filename.map"
 	keymap_file="$keymap_filename.map"
 	temp_map_files=("${temp_map_files[@]}" "$keymap_file")
+	comment_message="# Swaps [] with \{}\n"
 fi
 
 if [ "$swap_numbers" -eq 1 ]; then
@@ -45,11 +47,16 @@ if [ "$swap_numbers" -eq 1 ]; then
 	sed -r -e 's/([0-9]+) = (one|two|three|four|five|six|seven|eight|nine|zero)( +)([a-z]+)/\1 = \4\3\2/' "$keymap_file" > "$keymap_filename.map"
 	keymap_file="$keymap_filename.map"
 	temp_map_files=("${temp_map_files[@]}" "$keymap_file")
+	comment_message="$comment_message# Swaps numbers with their corresponding symbols\n"
 fi
+
+sed_string="1 s/^.*$/\# $keymap_file\n$comment_message# Map adapted from $old_keymap_file using the script at https:\/\/github.com\/azmr\/shift-swap\n#\n# Original info:\n#/"
+sed -r -e "$sed_string" "$keymap_file" > "$keymap_file.tmp"
+mv $keymap_filename.map.tmp $keymap_filename.map
 
 gzip -k "$keymap_filename.map"
 
-echo "temps: ${temp_map_files[@]}"
+# echo "temps: ${temp_map_files[@]}"
 
 for temp in "${temp_map_files[@]}"; do
 	rm "$temp"
