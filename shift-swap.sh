@@ -23,17 +23,15 @@ fi
 
 echo "b: $swap_braces, n: $swap_numbers"
 
-dir="$(dirname $1)"
-
+declare -a temp_map_files
 
 if [[ $keymap_file == *.gz ]]; then
-	gunzip $keymap_file
-	keymap_file=${keymap_file%???} # remove last 3 characters
+	gunzip -k $keymap_file			# unzip, but keep prev map file (-k)
+	keymap_file=${keymap_file%???}	# remove last 3 characters
+	temp_map_files=("${temp_map_files[@]}" "$keymap_file")
 fi
 
 keymap_filename=${keymap_file%????}
-
-declare -a temp_map_files
 
 if [ "$swap_braces" -eq 1 ]; then
 	keymap_filename=${keymap_filename}_b
@@ -47,5 +45,11 @@ if [ "$swap_numbers" -eq 1 ]; then
 	temp_map_files=("${temp_map_files[@]}" "$keymap_filename.map")
 fi
 
+gzip -k "$keymap_filename.map"
+
 echo "temps: ${temp_map_files[@]}"
+
+for temp in "${temp_map_files[@]}"; do
+	rm "$temp"
+done
 
