@@ -23,3 +23,11 @@ fi
 
 echo "b: $swap_braces, n: $swap_numbers"
 
+dir="$(dirname $1)"
+
+
+if [[ $keymap_file == *.gz ]]; then
+	gunzip $keymap_file
+	keymap_file=${keymap_file%???} # remove last 3 characters
+fi
+
