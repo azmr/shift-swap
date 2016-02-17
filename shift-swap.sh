@@ -1,11 +1,38 @@
 #!/bin/bash
 
+help_text(){
+	echo "SHIFT-SWAP:	Generates a keymap that swaps numbers/square brackets with their shifted counterparts"
+	echo "		allowing you to use symbols and/or curly braces more easily"
+	echo ""
+	echo "USAGE:		shift-swap.sh -[bhn] KEYMAP_FILE"
+	echo " 		Don't forget to load the generated map.gz file!"
+	echo ""
+	echo "EXAMPLES:	shift-swap.sh -b -n uk.map.gz"
+	echo "		shift-swap.sh -bn uk.map.gz"
+	echo "		shift-swap.sh -n us.map"
+	echo ""
+	echo "OPTIONS:	You must include at least one flag."
+	echo ""
+	echo "	-b	Braces - swap [] with \{} so that \{} is unshifted, [] is shifted."
+	echo ""
+	echo "	-h	Help - this text."
+	echo ""
+	echo "	-n	Numbers - swap numbers with symbols, so that symbols (e.g. $) are unshifted, numbers (e.g. 4) are shifted"
+	echo ""
+	exit
+}
+
+if [ "$1" == "--help" -o "$1" == "help" ]; then
+	help_text
+fi
+
 swap_braces=0
 swap_numbers=0
 
-while getopts ":bn" opt; do
+while getopts ":bhn" opt; do
 	case $opt in
 		b ) swap_braces=1;; 
+		h ) help_text;;
 		n ) swap_numbers=1;;
 		\? ) echo "Invalid option: -$OPTARG" >&2; exit;;
 	esac
