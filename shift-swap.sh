@@ -26,6 +26,7 @@ if [ "$1" == "--help" -o "$1" == "help" ]; then
 	help_text
 fi
 
+option_passed=0
 swap_braces=0
 swap_numbers=0
 
@@ -36,7 +37,13 @@ while getopts ":bhn" opt; do
 		n ) swap_numbers=1;;
 		\? ) echo "Invalid option: -$OPTARG" >&2; exit;;
 	esac
+	option_passed=1
 done
+
+if [ "$option_passed" != 1 ]; then
+	echo "No option passed. Exiting..."
+	exit
+fi
 
 # remove options from arg list
 shift "$((OPTIND-1))"
