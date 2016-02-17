@@ -31,3 +31,21 @@ if [[ $keymap_file == *.gz ]]; then
 	keymap_file=${keymap_file%???} # remove last 3 characters
 fi
 
+keymap_filename=${keymap_file%????}
+
+declare -a temp_map_files
+
+if [ "$swap_braces" -eq 1 ]; then
+	keymap_filename=${keymap_filename}_b
+	sed -r -e 's/([0-9]+) = (bracket.{4,5})( +)([a-z]+)/\1 = \4\3\2/' "$keymap_file" > "$keymap_filename.map"
+	temp_map_files=("${temp_map_files[@]}" "$keymap_filename.map")
+fi
+
+if [ "$swap_numbers" -eq 1 ]; then
+	keymap_filename=${keymap_filename}_n
+	sed -r -e 's/([0-9]+) = (one|two|three|four|five|six|seven|eight|nine|zero)( +)([a-z]+)/\1 = \4\3\2/' "$keymap_file" > "$keymap_filename.map"
+	temp_map_files=("${temp_map_files[@]}" "$keymap_filename.map")
+fi
+
+echo "temps: ${temp_map_files[@]}"
+
