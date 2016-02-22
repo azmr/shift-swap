@@ -30,10 +30,11 @@ option_passed=0
 swap_braces=0
 swap_numbers=0
 
-while getopts ":bhn" opt; do
+while getopts ":bhm:n" opt; do
 	case $opt in
 		b ) swap_braces=1;; 
 		h ) help_text;;
+		m ) mod_swap=1; echo $OPTARG; mod_args=$OPTARG;;
 		n ) swap_numbers=1;;
 		\? ) echo "Invalid option: -$OPTARG" >&2; exit;;
 	esac
@@ -55,7 +56,43 @@ if [ -z "$keymap_file" ]; then
 	exit
 fi
 
-echo "b: $swap_braces, n: $swap_numbers"
+echo "b: $swap_braces, n: $swap_numbers, m: $mod_swap $mod_args"
+
+# deal with caps/ctrl/esc swaps
+if [[ $mod_swap == 1 ]]; then
+	# ensure 3 letters long
+	if [[ ${#mod_args} != 3 ]]; then
+		echo "Error: must provide a 3 letter argument to option -m"
+		exit
+	fi
+
+	# ensure letters match 'elc'
+	if [[ $mod_args =~ [elc]{3} ]]; then
+		mod_arg_1=${mod_args:0:1}
+		mod_arg_2=${mod_args:1:1}
+		mod_arg_3=${mod_args:2:1}
+		echo 1: $mod_arg_1
+		
+		mod_args=""
+		for arg in $mod_arg_1 $mod_arg_2 $mod_arg_3; do
+			case $arg in
+				e ) mod_args=("${mod_args[@]}" "Escape");;
+				l ) mod_args=("${mod_args[@]}" "Caps_Lock");;
+				c ) mod_args=("${mod_args[@]}" "Control");;
+			esac
+		done
+
+		sed -r -e "s/(^keycode +[0-9]+ += +)(Escape)/\1aaaaaaaaaa/;
+			s/(^keycode +[0-9]+ += +)(Caps_Lock)/\1bbbbbbbbbb/;
+			s/(^keycode +[0-4][0-9]+ += +)(Control)/\1cccccccccc/;" "$keymap_file" > "$keymap_file.tmp"
+		sed -r -e "s/aaaaaaaaaa/${mod_args[1]}/;
+			s/bbbbbbbbbb/${mod_args[2]}/;
+			s/cccccccccc/${mod_args[3]}/" "$keymap_file.tmp"
+		# sed -r -e "s/(^keycode +[0-9]+ += +)(Escape)/\1${mod_args[0]}/" -e "s/(^keycode +[0-9]+ += +)(Caps_Lock)/\1${mod_args[1]}/" -e "s/(^keycode +[0-4][0-9]+ += +)(Control)/\1${mod_args[2]}/" "$keymap_file"
+	else
+		echo "Incorrect arguments for modifier swap: should be in the format 'elc'/'ecl'/'lec' etc..."
+	fi
+fi
 
 declare -a temp_map_files
 
