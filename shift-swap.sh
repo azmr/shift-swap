@@ -1,25 +1,43 @@
 #!/bin/bash
 
 help_text(){
-	echo "SHIFT-SWAP:	Generates a keymap that swaps numbers/square brackets with their shifted counterparts"
-	echo "		allowing you to use symbols and/or curly braces more easily"
-	echo ""
-	echo "USAGE:		shift-swap.sh -[bhn] KEYMAP_FILE"
-	echo " 		Don't forget to load the generated map.gz file!"
-	echo ""
-	echo "EXAMPLES:	shift-swap.sh -b -n uk.map.gz"
-	echo "		shift-swap.sh -bn uk.map.gz"
-	echo "		shift-swap.sh -n us.map"
-	echo ""
-	echo "OPTIONS:	You must include at least one flag."
-	echo ""
-	echo "	-b	Braces - swap [] with \{} so that \{} is unshifted, [] is shifted."
-	echo ""
-	echo "	-h	Help - this text."
-	echo ""
-	echo "	-n	Numbers - swap numbers with symbols, so that symbols (e.g. $) are unshifted, numbers (e.g. 4) are shifted"
-	echo ""
-	exit
+	cat << EOF 
+SHIFT-SWAP:	Generates a keymap that swaps numbers/square brackets with their
+		shifted counterparts, allowing you to use symbols and/or curly braces
+		more easily. Does not overwrite the original file, but make a backup
+		as good practice.
+
+USAGE:		shift-swap.sh -[bhn] [-m MODIFIER_REMAP] KEYMAP_FILE
+ 		Don't forget to load the generated map.gz file!
+
+EXAMPLES:	shift-swap.sh -b -n uk.map.gz
+		sudo shift-swap.sh -bn /usr/share/kbd/keymaps/i386/qwerty/uk.map.gz
+		shift-swap.sh -nm 'ecl' us.map
+		shift-swap.sh -m ece -b us.map
+
+OPTIONS:	You must include at least one flag.
+
+	-b	Braces - swap [] with {} so that {} is unshifted, [] is shifted.
+
+	-h	Help - this text.
+
+	-m	Modifiers - swap around the Escape, Caps Lock and Control keys as wished.
+			Takes a 3 letter argument.
+			1st letter is what the current Escape key will map to.
+			2nd letter is what the current Caps Lock key will map to.
+			3rd letter is what the current Control key will map to.
+			'e' -> Escape
+			'l' -> caps Lock
+			'c' -> Control
+			e.g.: for the argument 'elc':
+				Escape 		-> Escape
+				Caps Lock	-> Control
+				Control		-> Caps Lock
+
+	-n	Numbers - swap numbers with symbols, so that symbols (e.g. $) are unshifted, numbers (e.g. 4) are shifted
+
+EOF
+exit
 }
 
 if [ "$1" == "--help" -o "$1" == "help" ]; then
