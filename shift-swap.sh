@@ -36,14 +36,14 @@ while getopts ":bhm:n" opt; do
 		h ) help_text;;
 		m ) mod_swap=1; mod_keys=$OPTARG;;
 		n ) swap_numbers=1;;
-		\? ) echo "Invalid option: -$OPTARG" >&2; exit;;
+		\? ) echo "Invalid option: -$OPTARG" >&2; help_text;;
 	esac
 	option_passed=1
 done
 
 if [ "$option_passed" != 1 ]; then
 	echo "No option passed. Exiting..."
-	exit
+	help_text
 fi
 
 # remove options from arg list
@@ -53,7 +53,7 @@ keymap_file="$1"
 
 if [ -z "$keymap_file" ]; then
 	echo "No file provided. Exiting..." >&2
-	exit
+	help_text
 fi
 
 declare -a temp_map_files
@@ -73,7 +73,7 @@ if [[ $mod_swap == 1 ]]; then
 	# ensure 3 letters long
 	if [[ ${#mod_keys} != 3 ]]; then
 		echo "Error: must provide a 3 letter argument to option -m"
-		exit
+		help_text
 	fi
 
 	# ensure letters match 'elc'
